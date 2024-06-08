@@ -1,0 +1,231 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include "book.h"
+
+using namespace std;
+
+/*
+book.h
+#ifndef BOOK_H
+#define BOOK_H
+
+#include <string>
+using namespace std;
+
+// The Book class represents a book with a title, author, publication year, and number of pages.
+class Book {
+private:
+    // Attributes of the Book class
+    string title;   // Title of the book
+    string author;  // Author of the book
+    int year;       // Year the book was published
+    int pages;      // Number of pages in the book
+
+public:
+    // Constructor to initialize all attributes of the Book class
+    Book(const string& title, const string& author, int year, int pages);
+
+    // Getter methods to access the private attributes
+    string getTitle() const;    // Returns the title of the book
+    string getAuthor() const;   // Returns the author of the book
+    int getYear() const;        // Returns the publication year of the book
+    int getPages() const;       // Returns the number of pages in the book
+
+    // Method to print all information about the book
+    void printInfo() const;   // Prints the title, author, year, and pages of the book
+};
+
+#endif // BOOK_H
+*/
+
+//Inputlar: 
+/*
+1
+To Kill a Mockingbird
+Harper Lee
+1960
+281
+4
+*/
+
+/*
+1
+1984
+George Orwell
+1949
+328
+1
+The Great Gatsby
+F. Scott Fitzgerald
+1925
+218
+2
+4
+*/
+
+/*
+2
+3
+4
+*/
+
+/*
+4
+*/
+
+/*
+1
+The Hobbit
+J.R.R. Tolkien
+1937
+310
+1
+Fahrenheit 451
+Ray Bradbury
+1953
+194
+2
+1
+Jane Eyre
+Charlotte Brontë
+1847
+500
+2
+4
+*/
+
+/*
+1
+Jane Eyre
+Charlotte Brontë
+1847
+500
+3
+Jane Eyre
+3
+Animal Farm
+1
+Animal Farm
+George Orwell
+1945
+112
+3
+Animal Farm
+2
+4
+*/
+
+
+
+void sortBooks(vector<Book>& a, int size) {
+	
+	int k, loc, numElts = a.size();
+	for (k = 1; k < numElts; k++) {
+		Book hold = a[k];
+		loc = k;
+		while (0 < loc && hold.getAuthor() < a[loc - 1].getAuthor()) {
+			a[loc] = a[loc - 1];
+			loc--;
+		}
+		a[loc] = hold;
+	}
+	
+}
+
+
+int main() {
+
+	vector<Book> books;
+
+	int choice;
+	string _title;
+	string _author;
+	int _year;
+	int _pages;
+	bool checker2 = false;
+
+
+	while (true) {
+		cout << "Menu:" << endl;
+		cout << "1. Add a new book" << endl;
+		cout << "2. Display all books" << endl;
+		cout << "3. Search for a book by title" << endl;
+		cout << "4. Exit" << endl;
+		cout << "Enter your choice: ";
+		cin >> choice;
+		if (choice == 1) {
+			checker2 = true;
+			cin.ignore();
+			cout << "Enter title: ";
+			getline(cin, _title);
+			cout << "Enter author: ";
+			getline(cin, _author);
+			cout << "Enter year: ";
+			cin >> _year;
+			cout << "Enter pages: ";
+			cin >> _pages;
+
+
+			Book newBook(_title, _author, _year, _pages);
+			books.push_back(newBook);
+
+		}
+		else if (choice == 2) {
+			if (checker2 == true) {
+				sortBooks(books, books.size());
+				for (Book a : books) {
+					a.printInfo();
+					cout << "-------------------" << endl;
+
+					checker2 = true;
+				}
+			}
+			else {
+				cout << "The book collection is currently empty. Please add some books first." << endl;
+			}
+
+		}
+		else if (choice == 3) {
+
+			if (checker2 == true) {
+				cout << "Enter the title to search: ";
+				cin.ignore();
+				string bookName;
+				getline(cin, bookName);
+				bool checker = false;
+				for (Book a : books) {
+					if (a.getTitle() == bookName) {
+						a.printInfo();
+						checker = true;
+						break;
+
+					}
+
+
+
+				}
+				if (checker == false) {
+					cout << "Book not found!" << endl;
+				}
+			}
+			else {
+				cout << "The book collection is currently empty. Please add some books first." << endl;
+			}
+		}
+		else if (choice == 4) {
+			cout << "Exiting...";
+			break;
+
+		}
+
+	}
+
+
+
+
+
+
+
+	return 0;
+}
