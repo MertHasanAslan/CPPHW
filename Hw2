@@ -1,0 +1,215 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+//Input Ornekleri
+/*
+olleH dlroW
+1
+on1e
+*/
+
+/*
+Khoor Zruog
+2
+3
+1tw1o
+*/
+
+/*
+pot terces yek
+3
+0
+1
+hwo3
+*/
+
+/*
+Evce almwtivih ZepevQsvklypmw jegmrk liv hiwxmrc
+2
+4
+3
+*/
+
+/*
+tI emac ot .em s'tI ,enim ym ,nwo ym ,evol ym !suoicerp
+1
+r111n9
+*/
+
+/*
+Jo uif tibepx pg Nvbe'Ejc, Bssbljt esfbnt pg hsffo gvuvsft.
+2
+1
+p4u1
+*/
+
+
+
+
+
+
+int decodeNumber(const string& PositionWord) {
+	int sum = 0;
+	for (int i = 0; i < (int)PositionWord.length(); i++) {
+		char a = PositionWord.at(i);
+		if (isdigit(a)) {
+			sum = sum + (a - '0');
+
+		}
+	}
+	return sum;
+}
+
+string reverseWord(const string& word) {
+	string reversedWord = "";
+	int length = word.length();
+	for (int i = length - 1; i >= 0; i--) {
+		char a = word.at(i);
+		reversedWord += a;
+	}
+	return reversedWord;
+}
+
+string reverseLettersDecode(const string& message) {
+	string decodedMessage;
+	string word;
+	for (char i : message) {
+		if (i != ' ') {
+			word += i;
+		}
+		else if (i == ' ') {
+			decodedMessage += reverseWord(word) + " ";
+			word = "";
+		}
+
+	}
+
+	decodedMessage += reverseWord(word);
+	return decodedMessage;
+
+}
+string caesarCipherShiftDecode(const string& message, int shift) {
+	string newWord;
+	for (char i : message) {
+		if (isalpha(i)) {
+			if (islower(i)) {
+				char base = 'a';
+				i = ((i - base - shift + 26) % 26) + base;
+				newWord += i;
+			}
+			else {
+				char base = 'A';
+				i = ((i - base - shift + 26) % 26) + base;
+				newWord += i;
+			}
+		}
+		else {
+			newWord += i;
+		}
+
+	}
+	return newWord;
+}
+
+string findKey(const string& decodedMessage, int position) {
+	string secretWord = "";
+	string word = "";
+	int sum = 0;
+	bool check = false;
+	for (char i : decodedMessage) {
+		if (i == ' ') {
+			if (check == true) {
+				break;
+			}
+			sum++;
+		}
+		else {
+			
+			if (sum == (position-1)) {
+				word += i;
+
+				
+				check = true;
+
+			}
+		}
+		
+	}
+	secretWord = word;
+	return secretWord;
+}
+string removeLastPunctuation(string key) {
+	int length = key.length();
+
+	string newKey;
+	if (key.at(length-1) == '!' || key.at(length - 1) == '.' || key.at(length - 1) == ',' || key.at(length - 1) == ';' || key.at(length - 1) == ':' || key.at(length - 1) == '?') {
+		newKey = key.substr(0, (length - 1));
+	}
+	else {
+		newKey = key;
+	}
+	return newKey;
+}
+
+
+int main() {
+	string message, positionWord, decodedMessage, key, word, newKey;
+	int strategy, shift, shiftAmount, position;
+
+	
+	cout << "Enter your encoded message: ";
+	getline(cin, message);
+	cout << "Choose your decoding strategy: " << endl;
+	cout << "1. Reverse Letters" << endl;
+	cout << "2. Caesar Cipher Shift" << endl;
+	cout << "Enter choice (1 or 2): ";
+	cin >> strategy;
+	while ( strategy != 1 || strategy != 2) {
+
+		if (strategy == 1)
+		{
+			decodedMessage = reverseLettersDecode(message);
+			cout << "Enter the word to find the position of the key word: ";
+			cin >> positionWord;
+			position = decodeNumber(positionWord);
+
+			key = findKey(decodedMessage, position);
+			
+			newKey = removeLastPunctuation(key);
+			cout << "Decoded Message: " << decodedMessage << endl;
+			cout << "Secret Key: " << newKey << endl;
+			break;
+		}
+		else if (strategy == 2)
+		{
+			cout << "Enter Caesar Cipher Shift amount: ";
+			cin >> shiftAmount;
+			decodedMessage = caesarCipherShiftDecode(message, shiftAmount);
+			cout << "Enter the word to find the position of the key word: ";
+			cin >> positionWord;
+			position = decodeNumber(positionWord);
+
+			key = findKey(decodedMessage, position);
+			newKey = removeLastPunctuation(key);
+			cout << "Decoded Message: " << decodedMessage << endl;
+			cout << "Secret Key: " << newKey << endl;
+			break;
+
+
+		}
+		else {
+			cout << "Invalid choice. ";
+		}
+		cout << "Enter choice (1 or 2): ";
+		cin >> strategy;
+
+	}
+
+	
+
+
+
+
+	return 0;
+}
