@@ -1,0 +1,345 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include "strutils.h"
+
+using namespace std;
+//Input Ornekleri: 
+// weather.txt1:
+/*
+2024-06-01, 22.5, 1.2
+2024-06-02, 24.0, 0.0
+2024-06-26, 25.3, 3.4
+2024-06-06, 23.0, 4.5
+2024-06-05, 24.1, 0.0
+2024-06-07, 22.4, 2.0
+2024-06-08, 25.0, 0.0
+2024-06-09, 23.5, 1.5
+2024-06-10, 24.6, 0.0
+2024-06-20, 21.8, 0.0
+*/
+
+//weather.txt2: 
+/*
+2024-11-20, 10.0, 5.2
+2024-11-02, 8.5, 2.1
+2024-11-03, 7.3, 0.0
+2024-11-04, 9.4, 4.4
+2024-11-05, 6.8, 1.0
+2024-11-06, 5.5, 0.0
+2024-11-07, 7.0, 3.3
+2024-11-08, 8.2, 0.0
+2024-11-09, 6.9, 2.5
+2024-11-10, 7.4, 0.0
+*/
+
+//weather.txt3: 
+/*
+2024-12-01, 2.3, 1.1
+2024-12-02, 1.0, 0.0
+2024-12-03, 0.8, 4.2
+2024-12-24, -1.5, 0.0
+2024-12-05, 1.2, 3.5
+2024-12-06, 2.0, 0.0
+2024-12-07, 1.8, 2.3
+2024-12-08, 0.5, 0.0
+2024-12-09, -0.3, 5.0
+2024-12-10, 1.5, 0.0
+*/
+
+//Inputlar: 
+/*
+8
+*/
+
+/*
+7
+4
+8
+*/
+
+/*
+2
+1
+weather1.txt
+5
+6
+7
+8
+*/
+
+/*
+1
+weather
+1
+weather2.txt
+2
+5
+8
+*/
+
+/*
+3
+1
+weather3.txt
+3
+4
+9
+6
+8
+*/
+
+
+
+
+
+
+
+
+struct WeatherData {
+	string date;
+	double temprature;
+	double precipitation;
+
+};
+
+
+WeatherData parseLine(const string& line) {
+	WeatherData weather;
+
+	
+	int index1, index2;
+	index1 = line.find(",");
+	index2 = line.find(",", index1 + 1);
+	string datee = line.substr(0, index1);
+	weather.date = datee;
+	string temp = line.substr((index1 + 1), (index2 - index1 - 1));
+	weather.temprature = atof(temp);
+	string prec = line.substr(index2 + 1);
+	weather.precipitation = atof(prec);
+
+	return weather;
+}
+
+double averageTemperature(const vector<WeatherData>& data) {
+	double sum = 0.0;
+	int count = 0;
+	for (WeatherData weather : data) {
+		sum = sum + weather.temprature;
+		count++;
+	}
+
+	if (count != 0) {
+		return sum / count;
+	}
+	else {
+		return 0.0;
+	}
+}
+
+double totalPrecipitation(const vector<WeatherData>& data) {
+	double sum = 0.0;
+
+	for (WeatherData weather : data) {
+		sum = sum + weather.precipitation;
+	}
+
+	return sum;
+
+}
+
+WeatherData findExtremesTemperature(const vector<WeatherData>& data, bool findMax) {
+	WeatherData extreme;
+
+	if (data.empty()) {
+		cout << "Data vector is empty!" << endl;
+		return WeatherData();
+	}
+	extreme = data[0];
+
+	if (findMax) {
+		for (WeatherData weather : data) {
+			if (weather.temprature > extreme.temprature) {
+				extreme = weather;
+			}
+		}
+	}
+	else if (!findMax) {
+		for (WeatherData weather : data) {
+			if (weather.temprature < extreme.temprature) {
+				extreme = weather;
+			}
+		}
+	}
+	return extreme;
+
+}
+
+WeatherData maxPrecipitation(const vector<WeatherData>& data) {
+
+	if (data.empty()) {
+		cout << "Data vector is empty!" << endl;
+		return WeatherData();
+	}
+
+	WeatherData maxPrec;
+	maxPrec = data[0];
+	for (WeatherData weather : data) {
+		if (weather.precipitation > maxPrec.precipitation) {
+			maxPrec = weather;
+		}
+	}
+	return maxPrec;
+}
+
+int countDryDays(const vector<WeatherData>& data) {
+	int count = 0;
+	for (WeatherData weather : data) {
+		if (weather.precipitation == 0.0) {
+			count++;
+		}
+	}
+	return count;
+}
+
+string getFormattedDate(const string& date) {
+	const string months[] = { "January", "February", "March",
+	"April", "May", "June", "July", "August", "September",
+	"October", "November", "December" };
+	int index1, index2;
+	string year, month, day;
+	index1 = date.find("-");
+	index2 = date.find("-", index1 + 1);
+	year = date.substr(0, index1);
+	month = date.substr((index1 + 1), (index2 - index1 - 1));
+	day = date.substr(index2 + 1);
+	int monthInt = atoi(month);
+	string newDate = months[monthInt - 1] + " " + day + ", " + year;
+	return newDate;
+}
+
+
+
+int main() {
+	ifstream dosya;
+	string dosyaAdi;
+	bool Cold = false;
+	int choose = 0;
+
+	vector<WeatherData> weatherData;
+	bool checker = false;
+
+	
+	cout << "Welcome to the Weather Data Analysis Program!" << endl;
+	cout << "1. Load data file" << endl;
+	cout << "2. Display average temperature" << endl;
+	cout << "3. Display total precipitation" << endl;
+	cout << "4. Display the number of dry days" << endl;
+	cout << "5. Display the hottest day" << endl;
+	cout << "6. Display the coldest day" << endl;
+	cout << "7. Display the day with the highest precipitation" << endl;
+	cout << "8. Close the program" << endl << endl;
+	while (true) {
+		cout << "Choose an option: ";
+		cin >> choose;
+		if (choose == 1) {
+			cout << "Enter the file name: ";
+			cin >> dosyaAdi;
+			dosya.open(dosyaAdi.c_str());
+			if (dosya.fail()) {
+				cout << "Cannot open the file!" << endl;
+			}
+			else {
+				checker = true;
+				string lines;
+				while (getline(dosya, lines)) {
+					WeatherData data = parseLine(lines);
+					//cout << "data1: " << data.date << endl;
+					weatherData.push_back(data);
+				}
+				//for (int i = 0; i < weatherData.size(); i++)
+				//	cout << weatherData[i].date << " " << weatherData[i].precipitation << " " << weatherData[i].temprature << endl;
+				cout << "Data loaded successfully." << endl;
+			}
+		}
+
+		else if (choose == 2) {
+			if (checker) {
+				double averageTemp;
+				averageTemp = averageTemperature(weatherData);
+				cout << "Average Temperature: " << averageTemp << " Celsius" << endl;
+			}
+			else {
+				cout << "Please load a data file first." << endl;
+			}
+
+		}
+		else if (choose == 3) {
+			if (checker) {
+				double totalPrec;
+				totalPrec = totalPrecipitation(weatherData);
+				cout << "Total Precipitation: " << totalPrec << " mm" << endl;
+			}
+			else {
+				cout << "Please load a data file first." << endl;
+			}
+
+		}
+		else if (choose == 4) {
+			if (checker) {
+				int dryDays;
+				dryDays = countDryDays(weatherData);
+				cout << "Number of Dry Days: " << dryDays << endl;
+			}
+			else {
+				cout << "Please load a data file first." << endl;
+			}
+
+		}
+		else if (choose == 5) {
+			if (checker) {
+				WeatherData hottestDate;
+				hottestDate = findExtremesTemperature(weatherData, !Cold);
+				cout << "Hottest Day: " << getFormattedDate(hottestDate.date) << " with " << hottestDate.temprature << " Celsius" << endl;
+			}
+			else {
+				cout << "Please load a data file first." << endl;
+			}
+
+		}
+		else if (choose == 6) {
+			if (checker) {
+				WeatherData coldestDate;
+				coldestDate = findExtremesTemperature(weatherData, Cold);
+				cout << "Coldest Day: " << getFormattedDate(coldestDate.date) << " with " << coldestDate.temprature << " Celsius" << endl;
+			}
+			else {
+				cout << "Please load a data file first." << endl;
+			}
+
+		}
+		else if (choose == 7) {
+			if (checker) {
+				WeatherData highestPrec;
+				highestPrec = maxPrecipitation(weatherData);
+				cout << "Highest Precipitation Day: " << getFormattedDate(highestPrec.date) << " with " << highestPrec.precipitation << " mm" << endl;
+			}
+			else {
+				cout << "Please load a data file first." << endl;
+			}
+
+		}
+		else if (choose == 8) {
+			cout << "Exiting program..." << endl;
+			break;
+		}
+		else {
+			cout << "Invalid option. Please enter a valid option." << endl;
+		}
+
+	}
+	
+
+	return 0;
+}
